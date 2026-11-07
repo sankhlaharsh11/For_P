@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Emergency Peace Treaty • For Palak</title>
+  <style>
+    :root {
+      --bg-cream: #FFFBF8;
+      --card-bg: #FFFFFF;
+      --rose-primary: #FF6B8B;
+      --rose-soft: #FFE4E9;
+      --rose-dark: #D43F63;
+      --accent-gold: #FFB347;
+      --text-main: #2D2926;
+      --text-muted: #6E6864;
+      --border-color: #F1D4DC;
+      --shadow: 0 10px 30px rgba(212, 63, 99, 0.08);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background: var(--bg-cream);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .app-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 18px;
+      margin: auto 0;
+    }
+
+    .audio-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--rose-soft);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--rose-dark);
+      z-index: 25;
+      transition: transform 0.2s;
+    }
+    .audio-toggle:active {
+      transform: scale(0.9);
+    }
+
+    .nav-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+
+    .step-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #EEDADF;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: var(--rose-primary);
+      width: 22px;
+      border-radius: 10px;
+    }
+
+    .step-counter {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--rose-dark);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .step-view {
+      display: none;
+      flex-direction: column;
+      flex-grow: 1;
+      animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .step-view.active {
+      display: flex !important;
+    }
+
+    @keyframes fadeInSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    p.subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    .mascot-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 4px 0 14px 0;
+    }
+
+    .mascot-svg {
+      width: 110px;
+      height: 110px;
+      filter: drop-shadow(0 8px 16px rgba(255, 107, 139, 0.2));
+      animation: gentleFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .confession-card {
+      background: #FFF8F9;
+      border: 1.5px solid #FFCCD7;
+      border-left: 4px solid var(--rose-primary);
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin-bottom: 14px;
+    }
+
+    .confession-quote {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #3C3639;
+      font-style: italic;
+    }
+
+    .confession-author {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--rose-dark);
+      text-align: right;
+      font-style: normal;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      text-decoration: none;
+      position: relative;
+      z-index: 10;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+      opacity: 0.9;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--rose-primary), var(--rose-dark));
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(212, 63, 99, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--rose-soft);
+      color: var(--rose-dark);
+      flex: 0 0 75px;
+    }
+
+    .meter-container {
+      background: #FFF7F9;
+      border: 1px solid #FFE4E9;
+      border-radius: 16px;
+      padding: 18px 16px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .meter-emoji {
+      font-size: 3.6rem;
+      margin-bottom: 6px;
+      display: inline-block;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .meter-label {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--rose-dark);
+      margin-bottom: 4px;
+    }
+
+    .meter-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-wrapper {
+      margin-top: 16px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 8px;
+      background: #F8D3DC;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--rose-primary);
+      border: 3px solid #FFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    .exhibit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .exhibit-card {
+      background: #FFF7F9;
+      border: 1.5px dashed #F1C4CF;
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      user-select: none;
+    }
+
+    .exhibit-card.opened {
+      background: #FFF;
+      border-style: solid;
+      border-color: var(--rose-primary);
+      box-shadow: 0 4px 12px rgba(255, 107, 139, 0.1);
+    }
+
+    .exhibit-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .exhibit-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .exhibit-detail {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      display: none;
+      margin-top: 4px;
+    }
+
+    .exhibit-card.opened .exhibit-detail {
+      display: block;
+    }
+
+    .inspect-hint {
+      font-size: 0.74rem;
+      color: var(--rose-dark);
+      font-weight: 600;
+    }
+
+    .commitments-container {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      max-height: 310px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 8px;
+    }
+
+    .commitment-card {
+      border: 1.5px solid #F1D4DC;
+      border-radius: 14px;
+      padding: 11px 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      background: #FFF;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .commitment-card.checked {
+      border-color: var(--rose-primary);
+      background: #FFF8FA;
+    }
+
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      border: 2px solid #D9B7C1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .commitment-card.checked .custom-checkbox {
+      background: var(--rose-primary);
+      border-color: var(--rose-primary);
+    }
+
+    .custom-checkbox svg {
+      display: none;
+      width: 14px;
+      height: 14px;
+      stroke: white;
+    }
+
+    .commitment-card.checked .custom-checkbox svg {
+      display: block;
+    }
+
+    .commitment-info h4 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+      line-height: 1.25;
+    }
+
+    .commitment-info p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .meter-bar-box {
+      margin-top: 6px;
+      background: #F0E2E6;
+      border-radius: 10px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .meter-bar-fill {
+      background: linear-gradient(90deg, var(--accent-gold), var(--rose-primary));
+      height: 100%;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .verdict-box {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .evasive-wrap {
+      position: relative;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    #runaway-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      z-index: 12;
+    }
+
+    .celebration-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.98);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 50;
+      border-radius: var(--radius);
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-card">
+    <button class="audio-toggle" id="audioToggle" onclick="window.toggleAudio(event)" title="Toggle Sound">🔔</button>
+
+    <div class="nav-header">
+      <div class="step-dots" id="dotsContainer">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="step-counter" id="stepCounter">Step 1 of 5</div>
+    </div>
+
+    <!-- Step 1: Emergency Summons & Confession -->
+    <div class="step-view active" id="step1">
+      <div class="mascot-box">
+        <svg class="mascot-svg" viewBox="0 0 140 140">
+          <ellipse cx="70" cy="85" rx="50" ry="42" fill="#FFEAEF" />
+          <circle cx="70" cy="55" r="35" fill="#FFEAEF" />
+          <path d="M40 38 Q30 20 50 25" fill="#FFCCD7" stroke="#FFA3B7" stroke-width="3" stroke-linecap="round"/>
+          <path d="M100 38 Q110 20 90 25" fill="#FFCCD7" stroke="#FFA3B7" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="58" cy="52" rx="4.5" ry="6.5" fill="#2D2926"/>
+          <ellipse cx="82" cy="52" rx="4.5" ry="6.5" fill="#2D2926"/>
+          <circle cx="60" cy="50" r="1.8" fill="#FFF"/>
+          <circle cx="84" cy="50" r="1.8" fill="#FFF"/>
+          <ellipse cx="70" cy="62" rx="3.5" ry="2.5" fill="#D43F63"/>
+          <ellipse cx="48" cy="62" rx="5" ry="3" fill="#FFBCC9" opacity="0.8"/>
+          <ellipse cx="92" cy="62" rx="5" ry="3" fill="#FFBCC9" opacity="0.8"/>
+          <path d="M50 78 C50 68, 90 68, 90 78 L85 105 C85 110, 55 110, 55 105 Z" fill="#FFF" stroke="#FF6B8B" stroke-width="2"/>
+          <text x="70" y="93" font-size="9" font-weight="bold" fill="#D43F63" text-anchor="middle">SORRY</text>
+        </svg>
+      </div>
+
+      <h1>Emergency Peace Summit 🕊️</h1>
+      <p class="subtitle">Official summons issued for <strong>Palak</strong> from a very contrite fiancé named <strong>Harsh</strong>.</p>
+      
+      <div class="confession-card">
+        <div class="confession-quote">
+          "I know I haven't always been the ideal partner, and I hate that I've let you down. But I adore you, and I am not giving up on us so easily."
+          <span class="confession-author">— Harsh 🤍</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnStep1Next" onclick="window.goToStep(2)">Enter Peace Talks 🐾</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Calibrated Grump-o-Meter -->
+    <div class="step-view" id="step2">
+      <h1>The Grump-o-Meter 🌡️</h1>
+      <p class="subtitle">Please calibrate your annoyance level so we know the severity of Harsh's stay in your bad books.</p>
+
+      <div class="meter-container">
+        <div class="meter-emoji" id="meterEmoji">😤</div>
+        <div class="meter-label" id="meterLabel">Category 3: Seriously Annoyed</div>
+        <div class="meter-desc" id="meterDesc">Harsh was a certified 100% potato today. Investigation underway.</div>
+        
+        <div class="slider-wrapper">
+          <input type="range" min="1" max="5" value="3" id="grumpSlider" oninput="window.updateGrumpMeter(this.value)">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnStep2Back" onclick="window.goToStep(1)">Back</button>
+        <button class="btn btn-primary" id="btnStep2Next" onclick="window.goToStep(3)">Submit Calibration 📝</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Guilt Exhibits -->
+    <div class="step-view" id="step3">
+      <h1>Evidence of Guilt 🔍</h1>
+      <p class="subtitle">Tap each exhibit to inspect the official findings before we negotiate terms.</p>
+
+      <div class="exhibit-list">
+        <div class="exhibit-card" onclick="window.toggleExhibit(this)">
+          <div class="exhibit-icon">🧠</div>
+          <div>
+            <div class="exhibit-title">Exhibit A: Temporary Logic Deficiency</div>
+            <div class="inspect-hint">Tap to expand findings</div>
+            <div class="exhibit-detail">Harsh's critical thinking servers crashed simultaneously. He has no valid defense and pleads 100% guilty.</div>
+          </div>
+        </div>
+
+        <div class="exhibit-card" onclick="window.toggleExhibit(this)">
+          <div class="exhibit-icon">🏠</div>
+          <div>
+            <div class="exhibit-title">Exhibit B: Stuck in the Bad Books</div>
+            <div class="inspect-hint">Tap to expand findings</div>
+            <div class="exhibit-detail">Being in your bad books lacks warmth, your smiles, and peace. Rent is far too high and Harsh wants out immediately.</div>
+          </div>
+        </div>
+
+        <div class="exhibit-card" onclick="window.toggleExhibit(this)">
+          <div class="exhibit-icon">🥺</div>
+          <div>
+            <div class="exhibit-title">Exhibit C: Severe Palak Deficiency</div>
+            <div class="inspect-hint">Tap to expand findings</div>
+            <div class="exhibit-detail">Side effects include continuous sighing, staring blankly at the phone, and missing you endlessly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnStep3Back" onclick="window.goToStep(2)">Back</button>
+        <button class="btn btn-primary" id="btnStep3Next" onclick="window.goToStep(4)">Review My Commitments 📜</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Lifelong Commitment Vows -->
+    <div class="step-view" id="step4">
+      <h1>Lifelong Commitments 💍</h1>
+      <p class="subtitle">Tailored vows for our long distance journey. Tap to inspect and lock in Harsh's promises:</p>
+
+      <div class="commitments-container" id="vowList">
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>💬 Unfiltered Emotional Check-Ins</h4>
+            <p>Replacing short, passive "I'm fine" or strictly logistical workday updates with an honest share of emotional state, mental fatigue, or vulnerabilities—giving Palak an authentic window into what Harsh is actually going through inside.</p>
+          </div>
+        </div>
+
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>👂 The "Validate First, Solve Later" Rule</h4>
+            <p>As an analytical problem-solver, the natural instinct is often to offer quick logic or fix the situation immediately. This commitment vows to first reflect and sit with Palak's feelings ("I hear why that hurt/stressed you, and you're completely justified in feeling that way") before offering advice or answers.</p>
+          </div>
+        </div>
+
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>🕊️ Proactive Emotional Transparency</h4>
+            <p>A commitment to clearly voice feelings, anxieties, or apologies before silence or delayed texts leave room for overthinking and assumptions across the miles.</p>
+          </div>
+        </div>
+
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>🛡️ Always on the Same Team</h4>
+            <p>Us versus the misunderstanding, never me versus you.</p>
+          </div>
+        </div>
+
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>🌱 Homework Over Excuses</h4>
+            <p>Treating every stumble as an opportunity to be a better, more thoughtful partner.</p>
+          </div>
+        </div>
+
+        <div class="commitment-card checked" onclick="window.toggleVow(this)">
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="commitment-info">
+            <h4>❤️ Deliberately Choosing You Every Day</h4>
+            <p>Through busy weeks, long distances, and everyday chaos—you are my person.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--rose-dark); display: flex; justify-content: space-between;">
+        <span>Commitment Weight:</span>
+        <span id="vowScore">6 / 6 Vows Locked</span>
+      </div>
+      <div class="meter-bar-box">
+        <div class="meter-bar-fill" id="vowFill" style="width: 100%;"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnStep4Back" onclick="window.goToStep(3)">Back</button>
+        <button class="btn btn-primary" id="btnStep4Next" onclick="window.goToStep(5)">Seal The Treaty ⚖️</button>
+      </div>
+    </div>
+
+    <!-- Step 5: The Final Verdict -->
+    <div class="step-view" id="step5">
+      <div class="verdict-box">
+        <span style="font-size: 3rem;">🤝</span>
+        <h1>The Final Decision</h1>
+        <p class="subtitle" style="margin-bottom: 8px;">The terms of unconditional love, growth, and endless hugs have been tabled.</p>
+        <p style="font-size: 0.88rem; color: var(--rose-dark); font-weight: 600;">Will you forgive Harsh and take him out of your bad books?</p>
+      </div>
+
+      <div class="evasive-wrap" id="evasiveArena">
+        <button class="btn btn-secondary" id="runaway-btn" onclick="window.handleDodge(event)" onmouseover="window.handleDodge(event)">
+          Need 5 More Minutes 😤
+        </button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnStep5Back" onclick="window.goToStep(4)">Back</button>
+        <button class="btn btn-primary" id="btnForgive" onclick="window.triggerResolution()" style="background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
+          I Forgive You ❤️
+        </button>
+      </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div class="celebration-overlay" id="celebrationModal">
+      <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+      <h2 style="font-size: 1.5rem; color: var(--text-main); font-weight: 800; margin-bottom: 8px;">Treaty Ratified! 💍✨</h2>
+      <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 20px;">
+        Harsh has officially been removed from your bad books under strict probation to love, cherish, and give you the biggest hug.
+      </p>
+
+      <a id="waLink" class="btn btn-primary" style="width: 100%; max-width: 280px;" target="_blank">
+        Send Hug On WhatsApp 💬
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // Global Safe Audio
+    var audioCtx = null;
+    var soundEnabled = true;
+
+    function safePlayTone(freq, type, duration) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+          var AudioCtor = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioCtor();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function(){});
+        }
+        if (!audioCtx) return;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (duration || 0.15));
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + (duration || 0.15));
+      } catch(e) {}
+    }
+
+    function playBoop() { safePlayTone(520, 'sine', 0.1); }
+    function playChime() {
+      safePlayTone(587.33, 'triangle', 0.2);
+      setTimeout(function() { safePlayTone(880, 'sine', 0.35); }, 100);
+    }
+
+    window.toggleAudio = function(e) {
+      if (e) e.stopPropagation();
+      soundEnabled = !soundEnabled;
+      var btn = document.getElementById('audioToggle');
+      if (btn) btn.textContent = soundEnabled ? '🔔' : '🔕';
+      if (soundEnabled) playBoop();
+    };
+
+    // Navigation (Exposed Globally)
+    window.goToStep = function(step) {
+      playBoop();
+
+      for (var i = 1; i <= 5; i++) {
+        var el = document.getElementById('step' + i);
+        if (el) el.classList.remove('active');
+      }
+
+      var target = document.getElementById('step' + step);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      var dots = document.querySelectorAll('.dot');
+      dots.forEach(function(dot, idx) {
+        dot.classList.toggle('active', idx === step - 1);
+      });
+
+      var counter = document.getElementById('stepCounter');
+      if (counter) counter.textContent = 'Step ' + step + ' of 5';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Slider
+    var grumpData = {
+      1: { emoji: "🙂", label: "Category 1: Mild Pout", desc: "Just need a sweet text and some attention to reset." },
+      2: { emoji: "🤨", label: "Category 2: Skeptical Side-Eye", desc: "Harsh is on very thin ice and needs to tread carefully." },
+      3: { emoji: "😤", label: "Category 3: Seriously Annoyed", desc: "Harsh was a certified 100% potato today. Investigation underway." },
+      4: { emoji: "🔥", label: "Category 4: Defcon 2 Anger", desc: "Danger zone. Harsh is currently sleeping with one eye open." },
+      5: { emoji: "🌋", label: "Category 5: Supernova Rage", desc: "Evacuate the perimeter! Total system failure by Harsh!" }
+    };
+
+    window.updateGrumpMeter = function(val) {
+      playBoop();
+      var item = grumpData[val];
+      if (!item) return;
+      var emojiEl = document.getElementById('meterEmoji');
+      if (emojiEl) {
+        emojiEl.style.transform = "scale(1.25) rotate(5deg)";
+        setTimeout(function() { emojiEl.style.transform = "scale(1) rotate(0deg)"; }, 200);
+        emojiEl.textContent = item.emoji;
+      }
+      var labelEl = document.getElementById('meterLabel');
+      if (labelEl) labelEl.textContent = item.label;
+      var descEl = document.getElementById('meterDesc');
+      if (descEl) descEl.textContent = item.desc;
+    };
+
+    // Exhibit cards
+    window.toggleExhibit = function(card) {
+      playBoop();
+      if (!card) return;
+      card.classList.toggle('opened');
+      var hint = card.querySelector('.inspect-hint');
+      if (hint) {
+        hint.style.display = card.classList.contains('opened') ? 'none' : 'block';
+      }
+    };
+
+    // Vow cards
+    window.toggleVow = function(card) {
+      playChime();
+      if (!card) return;
+      card.classList.toggle('checked');
+      var all = document.querySelectorAll('.commitment-card').length;
+      var checked = document.querySelectorAll('.commitment-card.checked').length;
+      var scoreEl = document.getElementById('vowScore');
+      if (scoreEl) scoreEl.textContent = checked + ' / ' + all + ' Vows Locked';
+      var fillEl = document.getElementById('vowFill');
+      if (fillEl) fillEl.style.width = ((checked / all) * 100) + '%';
+    };
+
+    // Evasive Button
+    var dodgeCount = 0;
+    var dodgeExcuses = [
+      "Still Thinking... 🤔",
+      "Look over there! A puppy! 🐶",
+      "I promise to always listen! 👂",
+      "Bad books have zero stars! ⭐",
+      "Okay fine, you're forgiven! 💖"
+    ];
+
+    window.handleDodge = function(e) {
+      if (e) e.preventDefault();
+      if (dodgeCount >= dodgeExcuses.length - 1) {
+        window.triggerResolution();
+        return;
+      }
+      playBoop();
+      dodgeCount++;
+      var runawayBtn = document.getElementById('runaway-btn');
+      if (runawayBtn) {
+        runawayBtn.textContent = dodgeExcuses[dodgeCount];
+        var arena = document.getElementById('evasiveArena');
+        var rect = arena.getBoundingClientRect();
+        var maxX = (rect.width / 2) - 60;
+        var maxY = (rect.height / 2) - 25;
+        var randX = (Math.random() * (maxX * 2)) - maxX;
+        var randY = (Math.random() * (maxY * 2)) - maxY;
+        runawayBtn.style.transform = "translate(calc(-50% + " + randX + "px), calc(-50% + " + randY + "px))";
+        if (dodgeCount === dodgeExcuses.length - 1) {
+          runawayBtn.style.background = '#FF6B8B';
+          runawayBtn.style.color = '#FFF';
+        }
+      }
+    };
+
+    // Resolution Modal
+    window.triggerResolution = function() {
+      playChime();
+      var msg = encodeURIComponent("Treaty ratified! 💍 Harsh is officially forgiven and taken out of the bad books. Sending you a hug right now! ❤️✨");
+      var waLink = document.getElementById('waLink');
+      if (waLink) waLink.href = "https://wa.me/?text=" + msg;
+
+      var modal = document.getElementById('celebrationModal');
+      if (modal) modal.style.display = 'flex';
+      startConfetti();
+    };
+
+    // Ambient floating hearts background
+    var ambCanvas = document.getElementById('ambient-canvas');
+    if (ambCanvas) {
+      var ambCtx = ambCanvas.getContext('2d');
+      var particles = [];
+      function resizeCanvas() {
+        ambCanvas.width = window.innerWidth;
+        ambCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      for (var i = 0; i < 16; i++) {
+        particles.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          size: Math.random() * 8 + 6,
+          speed: Math.random() * 0.4 + 0.2,
+          opacity: Math.random() * 0.35 + 0.1,
+          angle: Math.random() * 360
+        });
+      }
+
+      function drawAmbient() {
+        ambCtx.clearRect(0, 0, ambCanvas.width, ambCanvas.height);
+        ambCtx.fillStyle = '#FF6B8B';
+        particles.forEach(function(p) {
+          ambCtx.globalAlpha = p.opacity;
+          ambCtx.save();
+          ambCtx.translate(p.x, p.y);
+          ambCtx.rotate((p.angle * Math.PI) / 180);
+          ambCtx.beginPath();
+          var topCurve = p.size * 0.3;
+          ambCtx.moveTo(0, topCurve);
+          ambCtx.bezierCurveTo(0, 0, -p.size / 2, 0, -p.size / 2, topCurve);
+          ambCtx.bezierCurveTo(-p.size / 2, (p.size + topCurve) / 2, 0, (p.size + topCurve) / 1.4, 0, p.size);
+          ambCtx.bezierCurveTo(0, (p.size + topCurve) / 1.4, p.size / 2, (p.size + topCurve) / 2, p.size / 2, topCurve);
+          ambCtx.bezierCurveTo(p.size / 2, 0, 0, 0, 0, topCurve);
+          ambCtx.fill();
+          ambCtx.restore();
+          p.y -= p.speed;
+          p.x += Math.sin(p.angle) * 0.3;
+          p.angle += 0.01;
+          if (p.y < -20) {
+            p.y = ambCanvas.height + 20;
+            p.x = Math.random() * ambCanvas.width;
+          }
+        });
+        requestAnimationFrame(drawAmbient);
+      }
+      drawAmbient();
+    }
+
+    // Confetti canvas
+    function startConfetti() {
+      var c = document.getElementById('confettiCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      c.width = c.parentElement.clientWidth;
+      c.height = c.parentElement.clientHeight;
+      var confs = [];
+      var colors = ['#FF6B8B', '#FFB347', '#10B981', '#60A5FA', '#F472B6'];
+      for (var i = 0; i < 50; i++) {
+        confs.push({
+          x: c.width / 2,
+          y: c.height / 2,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.7) * 9,
+          size: Math.random() * 7 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 10
+        });
+      }
+      function renderConfetti() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        confs.forEach(function(p) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.2;
+          p.rotation += p.rotSpeed;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+        requestAnimationFrame(renderConfetti);
+      }
+      renderConfetti();
+    }
+  </script>
+</body>
+</html>
